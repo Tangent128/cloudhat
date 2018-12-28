@@ -1,0 +1,12 @@
+[package]
+name = "cloudhat"
+version = "0.1.0"
+authors = ["Tangent 128 <Tangent128@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+clap = "2"
+diesel = { version = "1", features = ["sqlite"] }
+diesel_migrations = "1"
+migrations_macros = "1"
+warp = "0.1"
