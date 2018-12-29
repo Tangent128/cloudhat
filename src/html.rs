@@ -1,6 +1,12 @@
 //! Handlebars templates and associated response structs
+use std::str::from_utf8;
 use handlebars::{Handlebars, TemplateError};
+use rust_embed::RustEmbed;
 use tower_web::view::Handlebars as HandlebarsSerializer;
+
+#[derive(RustEmbed)]
+#[folder = "templates"]
+struct Assets;
 
 #[derive(Debug, PartialEq, Response)]
 #[web(either)]
@@ -25,26 +31,11 @@ impl Message {
     }
 }
 
-const PAGE_TMPL: &str = r#"<html><head>
-<title>{{> title}}</title>
-</head><body>
-{{~> content~}}
-</body></html>"#;
-
-const MESSAGE_TMPL: &str = r#"{{#> page}}
-{{#*inline "title"}}{{text}}{{/inline}}
-{{#*inline "content"}}
-<section>
-    <b>{{text}}</b>
-</section>
-{{/inline}}
-{{/page}}"#;
-
 pub fn init_handlebars() -> Result<HandlebarsSerializer, TemplateError> {
     let mut hb = Handlebars::new();
 
-    hb.register_template_string("page", PAGE_TMPL)?;
-    hb.register_template_string("message", MESSAGE_TMPL)?;
+    hb.register_template_string("page", from_utf8(&Assets::get("page.hbs").unwrap()).expect("UTF8"))?;
+    hb.register_template_string("message", from_utf8(&Assets::get("message.hbs").unwrap()).expect("UTF8"))?;
 
     Ok(HandlebarsSerializer::new_with_registry(hb))
 }
