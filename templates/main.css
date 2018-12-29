@@ -1,3 +1,47 @@
 body {
-    background: #444;
+    background: #def;
+    background: fixed linear-gradient(0deg, #cdf, #fff);
+    color: #ffa;
+    margin: 0px;
+    padding: 0px;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 20px;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+body > div {
+    display: flex;
+    flex-flow: column;
+    max-width: 600px;
+    background: linear-gradient(0deg, #333, #555);
+    border-radius: 20px;
+    padding: 10px;
+    margin: 10px;
+}
+
+h1 {
+    font-size: 34px;
+    line-height: 40px;
+    text-align: center;
+    margin: 0 0;
+}
+
+section {
+    background: linear-gradient(180deg, #333, #555);
+    padding: 8px 10px;
+    border-radius: 20px;
+}
+section + section {
+    margin-top: 4px;
+}
+
+p {
+    margin: 0 0;
+}
+
+* + p {
+    margin-top: 20px;
 }
