@@ -7,11 +7,11 @@ use diesel::prelude::*;
 use tower_web::ServiceBuilder;
 
 mod database;
-mod html;
+mod theme;
 mod schema;
 
 use crate::database::{Database};
-use crate::html::{
+use crate::theme::{
     init_handlebars,
     Message,
     Responses
