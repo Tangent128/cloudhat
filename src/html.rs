@@ -1,5 +1,5 @@
 //! Handlebars templates and associated response structs
-use handlebars::Handlebars;
+use handlebars::{Handlebars, TemplateError};
 use tower_web::view::Handlebars as HandlebarsSerializer;
 
 #[derive(Debug, PartialEq, Response)]
@@ -25,14 +25,26 @@ impl Message {
     }
 }
 
-const MESSAGE_TMPL: &str = r#"
-    <b>{{text}}</b>
-"#;
+const PAGE_TMPL: &str = r#"<html><head>
+<title>{{> title}}</title>
+</head><body>
+{{~> content~}}
+</body></html>"#;
 
-pub fn init_handlebars() -> HandlebarsSerializer {
+const MESSAGE_TMPL: &str = r#"{{#> page}}
+{{#*inline "title"}}{{text}}{{/inline}}
+{{#*inline "content"}}
+<section>
+    <b>{{text}}</b>
+</section>
+{{/inline}}
+{{/page}}"#;
+
+pub fn init_handlebars() -> Result<HandlebarsSerializer, TemplateError> {
     let mut hb = Handlebars::new();
 
-    hb.register_template_string("message", MESSAGE_TMPL).expect("Parsing template");
+    hb.register_template_string("page", PAGE_TMPL)?;
+    hb.register_template_string("message", MESSAGE_TMPL)?;
 
-    HandlebarsSerializer::new_with_registry(hb)
+    Ok(HandlebarsSerializer::new_with_registry(hb))
 }
