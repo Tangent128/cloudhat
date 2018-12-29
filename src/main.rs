@@ -14,6 +14,7 @@ use crate::database::{Database};
 use crate::theme::{
     message,
     serializer,
+    ThemeResource,
     View
 };
 
@@ -49,6 +50,7 @@ fn main() {
         .resource(CloudHatWeb {
             db: Database::connect(args.value_of("database").unwrap())
         })
+        .resource(ThemeResource)
         .serializer(serializer())
         .run(&listen_to)
         .unwrap();

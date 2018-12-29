@@ -9,6 +9,7 @@ clap = "2"
 diesel = { version = "1", features = ["sqlite"] }
 diesel_migrations = "1"
 handlebars = "1"
+http = "0.1"
 rust-embed = "4"
 serde = "1"
 tower-web = "0.3"

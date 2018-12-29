@@ -3,6 +3,7 @@ use std::ffi::OsStr;
 use std::path::Path;
 use std::str::from_utf8;
 use handlebars::Handlebars;
+use http::Response as HttpResponse;
 use rust_embed::RustEmbed;
 use tower_web::view::Handlebars as HandlebarsSerializer;
 
@@ -46,4 +47,26 @@ pub fn serializer() -> HandlebarsSerializer {
     }
 
     HandlebarsSerializer::new_with_registry(hb)
+}
+
+pub struct ThemeResource;
+
+impl_web!{
+    impl ThemeResource {
+        /// serve a text-based asset from the embedded assets
+        #[get("/assets/:path")]
+        fn serve_asset(&self, path: String) -> Result<HttpResponse<String>, http::Error> {
+            let mut response = HttpResponse::builder();
+            if let Some(asset_bytes) = Assets::get(&path) {
+                let asset = from_utf8(&asset_bytes).expect("utf8");
+                let ext = Path::new(&path).extension().and_then(|ext| ext.to_str());
+                response.header("Content-Type", match ext {
+                    Some("css") => "text/css",
+                    _ => "text/plain"
+                }).body(asset.to_string())
+            } else {
+                response.status(404).body("not found".into())
+            }
+        }
+    }
 }
