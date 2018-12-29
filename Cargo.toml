@@ -8,5 +8,4 @@ edition = "2018"
 clap = "2"
 diesel = { version = "1", features = ["sqlite"] }
 diesel_migrations = "1"
-migrations_macros = "1"
-warp = "0.1"
+tower-web = "0.3"
