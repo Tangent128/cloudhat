@@ -1,6 +1,8 @@
 //! Handlebars templates and associated response structs
+use std::ffi::OsStr;
+use std::path::Path;
 use std::str::from_utf8;
-use handlebars::{Handlebars, TemplateError};
+use handlebars::Handlebars;
 use rust_embed::RustEmbed;
 use tower_web::view::Handlebars as HandlebarsSerializer;
 
@@ -31,11 +33,18 @@ impl Message {
     }
 }
 
-pub fn init_handlebars() -> Result<HandlebarsSerializer, TemplateError> {
+pub fn init_handlebars() -> HandlebarsSerializer {
     let mut hb = Handlebars::new();
 
-    hb.register_template_string("page", from_utf8(&Assets::get("page.hbs").unwrap()).expect("UTF8"))?;
-    hb.register_template_string("message", from_utf8(&Assets::get("message.hbs").unwrap()).expect("UTF8"))?;
+    for path_str in Assets::iter() {
+        let path = Path::new(&*path_str);
+        if path.extension() == Some(OsStr::new("hbs")) {
+            let name = path.file_stem().unwrap().to_str().expect("utf8");
+            let template_bytes = Assets::get(&path_str).unwrap();
+            let template = from_utf8(&template_bytes).expect("utf8");
+            hb.register_template_string(name, template).expect("Parsing template");
+        }
+    }
 
-    Ok(HandlebarsSerializer::new_with_registry(hb))
+    HandlebarsSerializer::new_with_registry(hb)
 }

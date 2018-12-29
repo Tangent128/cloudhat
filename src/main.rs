@@ -49,7 +49,7 @@ fn main() {
         .resource(CloudHatWeb {
             db: Database::connect(args.value_of("database").unwrap())
         })
-        .serializer(init_handlebars().expect("Parsing templates"))
+        .serializer(init_handlebars())
         .run(&listen_to)
         .unwrap();
 }
