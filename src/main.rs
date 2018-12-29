@@ -12,9 +12,9 @@ mod schema;
 
 use crate::database::{Database};
 use crate::theme::{
-    init_handlebars,
-    Message,
-    Responses
+    message,
+    serializer,
+    View
 };
 
 struct CloudHatWeb {
@@ -25,10 +25,10 @@ impl_web! {
     impl CloudHatWeb {
         #[get("/player/:key")]
         #[content_type("html")]
-        fn show_player(&self, key: String) -> QueryResult<Responses> {
+        fn show_player(&self, key: String) -> QueryResult<View> {
             self.db.player_from_key(&key).map(|option| match option {
-                Some(player) => Message::new(200, format!("Player's name is {}", player.name)),
-                None => Message::new(404, "Player does not exist".into())
+                Some(player) => message(200, format!("Player's name is {}", player.name)),
+                None => message(404, "Player does not exist".into())
             })
         }
     }
@@ -49,7 +49,7 @@ fn main() {
         .resource(CloudHatWeb {
             db: Database::connect(args.value_of("database").unwrap())
         })
-        .serializer(init_handlebars())
+        .serializer(serializer())
         .run(&listen_to)
         .unwrap();
 }
@@ -69,6 +69,6 @@ mod test {
     fn show_player() {
         let app = test_controller();
 
-        assert_eq!(app.show_player("nonsense".into()), Ok(Message::new(404, "Player does not exist".into())));
+        assert_eq!(app.show_player("nonsense".into()), Ok(message(404, "Player does not exist".into())));
     }
 }

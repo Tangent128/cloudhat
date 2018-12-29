@@ -12,7 +12,7 @@ struct Assets;
 
 #[derive(Debug, PartialEq, Response)]
 #[web(either)]
-pub enum Responses {
+pub enum View {
     Message(Message)
 }
 
@@ -24,16 +24,15 @@ pub struct Message {
     text: String
 }
 
-impl Message {
-    pub fn new(code: u16, text: String) -> Responses {
-        Responses::Message(Message {
-            status: code,
-            text
-        })
-    }
+/// A minimal view presenting an error or diagnostic message
+pub fn message(code: u16, text: String) -> View {
+    View::Message(Message {
+        status: code,
+        text
+    })
 }
 
-pub fn init_handlebars() -> HandlebarsSerializer {
+pub fn serializer() -> HandlebarsSerializer {
     let mut hb = Handlebars::new();
 
     for path_str in Assets::iter() {
