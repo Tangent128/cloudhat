@@ -12,6 +12,7 @@ mod schema;
 
 use crate::database::{Database};
 use crate::html::{
+    init_handlebars,
     Message,
     Responses
 };
@@ -23,7 +24,7 @@ struct CloudHatWeb {
 impl_web! {
     impl CloudHatWeb {
         #[get("/player/:key")]
-        #[content_type("json")]
+        #[content_type("html")]
         fn show_player(&self, key: String) -> QueryResult<Responses> {
             self.db.player_from_key(&key).map(|option| match option {
                 Some(player) => Message::new(200, format!("Player's name is {}", player.name)),
@@ -48,6 +49,7 @@ fn main() {
         .resource(CloudHatWeb {
             db: Database::connect(args.value_of("database").unwrap())
         })
+        .serializer(init_handlebars())
         .run(&listen_to)
         .unwrap();
 }
