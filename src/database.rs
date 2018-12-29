@@ -1,4 +1,4 @@
-/// Service responsible for managing database queries.
+//! Service responsible for managing database queries.
 
 embed_migrations!();
 

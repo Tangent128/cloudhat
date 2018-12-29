@@ -7,9 +7,14 @@ use diesel::prelude::*;
 use tower_web::ServiceBuilder;
 
 mod database;
+mod html;
 mod schema;
 
 use crate::database::{Database};
+use crate::html::{
+    Message,
+    Responses
+};
 
 struct CloudHatWeb {
     db: Database
@@ -18,10 +23,11 @@ struct CloudHatWeb {
 impl_web! {
     impl CloudHatWeb {
         #[get("/player/:key")]
-        fn show_player(&self, key: String) -> QueryResult<String> {
+        #[content_type("json")]
+        fn show_player(&self, key: String) -> QueryResult<Responses> {
             self.db.player_from_key(&key).map(|option| match option {
-                Some(player) => format!("Player's name is {}", player.name),
-                None => "Player does not exist, this should really be a 404 silly".into()
+                Some(player) => Message::new(200, format!("Player's name is {}", player.name)),
+                None => Message::new(404, "Player does not exist".into())
             })
         }
     }
@@ -44,4 +50,23 @@ fn main() {
         })
         .run(&listen_to)
         .unwrap();
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    /// make an empty database for testing
+    fn test_controller() -> CloudHatWeb {
+        CloudHatWeb {
+            db: Database::connect(":memory:")
+        }
+    }
+
+    #[test]
+    fn show_player() {
+        let app = test_controller();
+
+        assert_eq!(app.show_player("nonsense".into()), Ok(Message::new(404, "Player does not exist".into())));
+    }
 }
