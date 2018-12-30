@@ -1,11 +1,16 @@
 //! Handlebars templates and associated response structs
+use std::borrow::Cow;
+use std::io::Cursor;
 use std::ffi::OsStr;
 use std::path::Path;
 use std::str::from_utf8;
+
 use handlebars::Handlebars;
 use http::Response as HttpResponse;
 use rust_embed::RustEmbed;
+use tower_web::codegen::futures::prelude::*;
 use tower_web::view::Handlebars as HandlebarsSerializer;
+use tower_web::util::BufStream;
 
 #[derive(RustEmbed)]
 #[folder = "templates"]
@@ -51,21 +56,32 @@ pub fn serializer() -> HandlebarsSerializer {
 
 pub struct ThemeResource;
 
+/// wrapper to return a static byte buffer within a Response
+struct BinaryResponse<T>(Option<T>);
+
+impl<T: AsRef<[u8]>> BufStream for BinaryResponse<T> {
+    type Item = Cursor<T>;
+    type Error = ();
+
+    fn poll(&mut self) -> Poll<Option<Self::Item>, ()> {
+        Ok(Async::Ready(self.0.take().map(Cursor::new)))
+    }
+}
+
 impl_web!{
     impl ThemeResource {
-        /// serve a text-based asset from the embedded assets
+        /// serve embedded assets
         #[get("/assets/:path")]
-        fn serve_asset(&self, path: String) -> Result<HttpResponse<String>, http::Error> {
+        fn serve_asset(&self, path: String) -> Result<HttpResponse<BinaryResponse<Cow<'static, [u8]>>>, http::Error> {
             let mut response = HttpResponse::builder();
             if let Some(asset_bytes) = Assets::get(&path) {
-                let asset = from_utf8(&asset_bytes).expect("utf8");
                 let ext = Path::new(&path).extension().and_then(|ext| ext.to_str());
                 response.header("Content-Type", match ext {
                     Some("css") => "text/css",
                     _ => "text/plain"
-                }).body(asset.to_string())
+                }).body(BinaryResponse(Some(asset_bytes)))
             } else {
-                response.status(404).body("not found".into())
+                response.status(404).body(BinaryResponse(Some("not found".as_bytes().into())))
             }
         }
     }
