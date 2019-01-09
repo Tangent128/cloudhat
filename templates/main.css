@@ -22,11 +22,18 @@ body > div {
     margin: 10px;
 }
 
+h1, h2 {
+    margin: 0 0;
+}
 h1 {
     font-size: 34px;
     line-height: 40px;
     text-align: center;
-    margin: 0 0;
+}
+h2 {
+    font-size: 24px;
+    line-height: 39px;
+    border-bottom: 1px #ffa solid;
 }
 
 section {
@@ -38,10 +45,22 @@ section + section {
     margin-top: 4px;
 }
 
-p {
+p, label {
+    display: block;
     margin: 0 0;
+    line-height: 20px;
+}
+label {
+    font-weight: bold;
+}
+input {
+    line-height: 20px;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 
-* + p {
+* + p, * + label {
     margin-top: 20px;
 }

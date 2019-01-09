@@ -15,6 +15,7 @@ use crate::theme::{
     message,
     serializer,
     ThemeResource,
+    view,
     View
 };
 
@@ -28,7 +29,7 @@ impl_web! {
         #[content_type("html")]
         fn show_player(&self, key: String) -> QueryResult<View> {
             self.db.player_from_key(&key).map(|option| match option {
-                Some(player) => message(200, format!("Player's name is {}", player.name)),
+                Some(player) => view(|model| model.player = Some(player)),
                 None => message(404, "Player does not exist".into())
             })
         }

@@ -1,5 +1,10 @@
 {{~#> page}}
-{{#*inline "title"}}Cloud Hat{{/inline}}
+{{#*inline "title"}}{{#if player~}}
+    {{~player.name}} 🎩 Cloud Hat
+{{~else~}}
+    Cloud Hat
+{{~/if}}{{/inline}}
 {{#*inline "content"}}
+{{#if player~}}{{> player}}{{~/if}}
 {{/inline}}
 {{/page~}}
