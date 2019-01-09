@@ -6,7 +6,7 @@ use std::sync::{Mutex, MutexGuard};
 
 use diesel::prelude::*;
 
-#[derive(Queryable)]
+#[derive(Debug, PartialEq, Serialize, Queryable)]
 pub struct Player {
     pub id: i32,
     pub url_key: String,

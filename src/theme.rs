@@ -12,6 +12,8 @@ use tower_web::codegen::futures::prelude::*;
 use tower_web::view::Handlebars as HandlebarsSerializer;
 use tower_web::util::BufStream;
 
+use crate::database::Player;
+
 #[derive(RustEmbed)]
 #[folder = "templates"]
 struct Assets;
@@ -34,6 +36,7 @@ pub struct Message {
 #[derive(Debug, PartialEq, Response)]
 #[web(template = "generic")]
 pub struct ViewModel {
+    pub player: Option<Player>
 }
 
 /// A minimal view presenting an error or diagnostic message
@@ -47,6 +50,7 @@ pub fn message(code: u16, text: String) -> View {
 /// A generic view based off the data given to the model
 pub fn view(init: impl FnOnce(&mut ViewModel)) -> View {
     let mut model = ViewModel {
+        player: None
     };
     init(&mut model);
     View::Generic(model)
