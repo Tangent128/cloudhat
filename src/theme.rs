@@ -19,7 +19,8 @@ struct Assets;
 #[derive(Debug, PartialEq, Response)]
 #[web(either)]
 pub enum View {
-    Message(Message)
+    Message(Message),
+    Generic(ViewModel)
 }
 
 #[derive(Debug, PartialEq, Response)]
@@ -30,12 +31,25 @@ pub struct Message {
     text: String
 }
 
+#[derive(Debug, PartialEq, Response)]
+#[web(template = "generic")]
+pub struct ViewModel {
+}
+
 /// A minimal view presenting an error or diagnostic message
 pub fn message(code: u16, text: String) -> View {
     View::Message(Message {
         status: code,
         text
     })
+}
+
+/// A generic view based off the data given to the model
+pub fn view(init: impl FnOnce(&mut ViewModel)) -> View {
+    let mut model = ViewModel {
+    };
+    init(&mut model);
+    View::Generic(model)
 }
 
 pub fn serializer() -> HandlebarsSerializer {
